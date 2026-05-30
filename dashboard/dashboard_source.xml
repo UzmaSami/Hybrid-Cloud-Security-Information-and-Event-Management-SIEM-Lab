@@ -1,1 +1,82 @@
 
+<dashboard version="1.1" theme="dark">
+  <label>Hybrid SOC Monitoring Console</label>
+  <description>Live Production Security Monitoring - Azure Cloud &amp; On-Premises AD</description>
+  <row>
+    <panel>
+      <single>
+        <title>On-Prem Brute Force Attempts (24h)</title>
+        <search>
+          <query>index=* source="WinEventLog:Security" EventCode=4625 | stats count</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0x53A051","0xF8BE34","0xDC4E41"]</option>
+        <option name="rangeValues">[10,50]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Active Account Lockouts (24h)</title>
+        <search>
+          <query>index=* source="WinEventLog:Security" EventCode=4740 | stats count</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0x53A051","0xF8BE34","0xDC4E41"]</option>
+        <option name="rangeValues">[1,5]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Azure Failed Sign-Ins (24h)</title>
+        <search>
+          <query>index=* "Sign-in activity" "50126" | stats count</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0x53A051","0xF8BE34","0xDC4E41"]</option>
+        <option name="rangeValues">[5,20]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>🔒 Live Active Directory Authentication Failures</title>
+        <search>
+          <query>index=* source="WinEventLog:Security" EventCode=4625 
+| eval Account=coalesce(TargetUserName, Account_Name, user) 
+| stats count by Account 
+| search Account!="-"
+| sort - count</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>☁️ Live Azure Sign-In Activity</title>
+        <search>
+          <query>index=* "Sign-in activity" 
+| stats count by identity, location, resultType 
+| rename identity as "Cloud Account", location as "Country", resultType as "Status (0=Success, 50126=Fail)"</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>
