@@ -27,12 +27,3 @@ graph TD
         E -->|TCP Port 9997| F
         F -->|Data Normalization| G((Hybrid SOC Dashboard))
     end
-    subgraph "On-Premises Network"
-        D[Windows Server 2022 <br/> Domain Controller] -->|Event Logs: 4625, 4740| E[Splunk Universal Forwarder]
-    end
-
-    subgraph "Security Operations Center (SOC)"
-        C -->|REST API Ingestion| F[Splunk Enterprise <br/> Indexer & Search Head]
-        E -->|TCP Port 9997| F
-        F -->|SPL & XML Parsing| G((Hybrid SOC <br/> Dashboard))
-    endb
