@@ -12,15 +12,21 @@ This lab demonstrates practical skills in cloud infrastructure provisioning, API
 - **Scripting & Automation:** PowerShell, Simple XML, Splunk Processing Language (SPL)
 
 ## 🏗️ Architecture Diagram
-*(This diagram was generated using Mermaid.js and renders natively in GitHub)*
-
-```mermaid
 graph TD
-    subgraph "Microsoft Azure Cloud"
-        A[Entra ID / Azure AD] -->|Diagnostic Settings| B[Azure Event Hub]
-        B -->|AMQP / Port 5671| C{Azure App Registration <br/> Service Principal}
+    subgraph Cloud ["Microsoft Azure Cloud"]
+        A[Entra ID] -->|Diagnostic Settings| B[Azure Event Hub]
+        B -->|AMQP Port 5671| C{Azure App Registration}
     end
 
+    subgraph OnPrem ["On-Premises Network"]
+        D[Windows Server Domain Controller] -->|Event 4625 and 4740| E[Splunk Universal Forwarder]
+    end
+
+    subgraph SOC ["Security Operations Center"]
+        C -->|REST API Ingestion| F[Splunk Enterprise SIEM]
+        E -->|TCP Port 9997| F
+        F -->|Data Normalization| G((Hybrid SOC Dashboard))
+    end
     subgraph "On-Premises Network"
         D[Windows Server 2022 <br/> Domain Controller] -->|Event Logs: 4625, 4740| E[Splunk Universal Forwarder]
     end
